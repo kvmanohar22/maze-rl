@@ -13,3 +13,18 @@ Example Matrix:
 0 0 0 0 0 1 0 0 0 0 0 0 0
 0 0 0 0 0 1 0 0 0 0 0 0 0
 ```
+
+## Dependencies
+
+- ROS Kinetic
+
+
+## Usage
+
+- Starting the simulator
+   Run the last command in another terminal
+   ```bash
+   $ rosmake turtlesim
+   $ roscore
+   $ rosrun turtlesim turtlesim_node
+   ```

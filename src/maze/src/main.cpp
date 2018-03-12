@@ -1,18 +1,27 @@
 #include <iostream>
 
 #include "maze/simulator.hpp"
+#include "maze/rl.hpp"
+#include "maze/utils.hpp"
+
 #include "ros/ros.h"
 
+#include "opencv2/opencv.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 using namespace std;
-using namespace maze;
+using namespace cv;
 
 int main(int argc, char **argv) {
 
-   cout << "Running the simulator\n";
-   ros::init(argc, argv, "simulator");
-   Simulator sim;
+Mat image(810, 810, CV_8UC3, Scalar(0,0,0));
+namedWindow("maze", WINDOW_AUTOSIZE);
 
-   // sim.move_straight(1, 0, 3);
-   sim.rotate(0.2, 1);
-   return 0;
+utils::construct_maze(image);
+imshow("maze", image);
+
+waitKey(0);
+
 }
