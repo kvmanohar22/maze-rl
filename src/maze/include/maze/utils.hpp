@@ -2,6 +2,7 @@
 #define _MAZE_UTILS_HPP_
 
 #include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -54,7 +55,8 @@ void arrow(cv::Mat &img, int direction,
 
 void text(cv::Mat &img, const cv::String &text, int x, int y) {
 
-   cv::putText(img, text, cv::Point(10+x*80, y*80+80-5), cv::FONT_HERSHEY_SIMPLEX,
+   cv::putText(img, text, cv::Point(10+x*80, y*80+80-5),
+               cv::FONT_HERSHEY_SIMPLEX,
                0.4, utils::blue, 1);
 }
 
@@ -68,6 +70,14 @@ void construct_maze(cv::Mat &img) {
            utils::white);
    }
 }
+
+
+void reset_patch(cv::Mat &img, cv::Point p1, cv::Point p2) {
+   for (int i = p1.x*80+5+1; i < p2.x*80+5; ++i)
+      for (int j = p1.y*80+5+1; j < p2.y*80+5; ++j)
+         img.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0);
+}
+
 
 }
 
