@@ -6,7 +6,6 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-
 #include <climits>
 #include <iostream>
 #include <sstream>
@@ -39,11 +38,10 @@ namespace rl {
          // update the value function and display the result
          single_update();
          display_vals();
-         draw_arrows();
 
          // update the display
          imshow("maze", img);
-         waitKey(1000);
+         waitKey(30);
          ++step_idx;
       }
    }
@@ -115,24 +113,24 @@ namespace rl {
       switch(dir) {
          case 0:
             if (r_idx == 0)
-               return value_function[r_idx * cols + c_idx];
+               return vs[r_idx * cols + c_idx];
             else
-               return value_function[(r_idx-1) * cols + c_idx];
+               return vs[(r_idx-1) * cols + c_idx];
          case 1:
             if (c_idx == rows-1)
-               return value_function[r_idx * cols + c_idx];
+               return vs[r_idx * cols + c_idx];
             else
-               return value_function[r_idx * cols + c_idx + 1];
+               return vs[r_idx * cols + c_idx + 1];
          case 2:
             if (r_idx == rows-1)
-               return value_function[r_idx * cols + c_idx];
+               return vs[r_idx * cols + c_idx];
             else
-               return value_function[(r_idx+1) * cols + c_idx];
+               return vs[(r_idx+1) * cols + c_idx];
          case 3:
             if (c_idx == 0)
-               return value_function[r_idx * cols + c_idx];
+               return vs[r_idx * cols + c_idx];
             else
-               return value_function[r_idx * cols + c_idx-1];
+               return vs[r_idx * cols + c_idx-1];
          default:
             return 0;
          }
@@ -149,7 +147,7 @@ namespace rl {
    void value_iteration::set_init_table() {
       for (int i = 0; i < rows; ++i)
          for (int j = 0; j < cols; ++j)
-            value_function[i*cols+j] = 0;
+            vs[i*cols+j] = 0;
    }
 
 
@@ -159,7 +157,7 @@ namespace rl {
          exit(-1);
       }
 
-      double *new_value_function = new double[rows*cols];
+      double *new_vs = new double[rows*cols];
       for (int i = 0; i < rows; ++i) {
          for (int j = 0; j < cols; ++j) {
             double max_qval = double(INT_MIN);
@@ -169,71 +167,39 @@ namespace rl {
                   max_qval = curr_qval;
                }
             }
-            new_value_function[i*cols+j] = max_qval;
+            new_vs[i*cols+j] = max_qval;
          }
       }
-      value_function = new_value_function;
+      vs = new_vs;
    }
 
 
    void value_iteration::display_vals() {
-      for (int i = 0; i < 10; ++i) {
-         for (int j = 0; j < 10; ++j) {
+      for (int i = 0; i < rows; ++i) {
+         for (int j = 0; j < cols; ++j) {
             std::ostringstream txt;
-            txt << roundf(value_function[i*cols+j] * 100) / 100;
+            txt << roundf(vs[i*cols+j] * 100) / 100;
             cv::String str = txt.str();
-            utils::reset_patch(img, Point(j, i), Point(j+1, i+1));
+            if (is_target(Point(i, j)))
+               utils::reset_patch(img, Point(j, i), Point(j+1, i+1), 1);
+            else if (is_obstacle(Point(i, j)))
+               utils::reset_patch(img, Point(j, i), Point(j+1, i+1), 2);
+            else
+               utils::reset_patch(img, Point(j, i), Point(j+1, i+1));
             utils::text(img, str, i, j);
+            if (cv::Point(i, j) != this->target)
+               utils::draw_arrows(img, vs, i, j);
          }
       }
    }
 
+   void value_iteration::set_obstacles(std::vector<cv::Point> pts) {
+      this->obstacles = pts;
+   }
 
-   void value_iteration::draw_arrows() {
-      for (int i = 0; i < 10; ++i) {
-         for (int j = 0; j < 10; ++j) {
-            int direction = -1;
-            if (i == 0 & j == 0) {
-               if (value_function[i*cols+j+1] > value_function[(i+1)*cols+j])
-                  direction = 1;
-               else
-                  direction = 2;
-            } else if (i == 0 & j == 9) {
-               if (value_function[i*cols+j-1] > value_function[(i+1)*cols+j])
-                  direction = 3;
-               else
-                  direction = 2;
-            } else if (i == 9 & j == 0) {
-               if (value_function[i*cols+j+1] > value_function[(i-1)*cols+j])
-                  direction = 1;
-               else
-                  direction = 0;
-            } else if (i == 9 & j == 9) {
-               if (value_function[i*cols+j-1] > value_function[(i-1)*cols+j])
-                  direction = 3;
-               else
-                  direction = 0;
-            } else {
-               double max_q = value_function[(i-1)*cols+j];
-               direction = 0;
-               if (max_q < value_function[i*cols+j+1]) {
-                  direction = 1;
-                  max_q = value_function[i*cols+j+1];
-               }
-               if (max_q < value_function[(i+1)*cols+j]) {
-                  direction = 2;
-                  max_q = value_function[(i+1)*cols+j];
-               }
-               if (max_q < value_function[i*cols+j-1]) {
-                  direction = 3;
-                  max_q = value_function[i*cols+j-1];
-               }
-            }
 
-            // draw the direction
-            utils::arrow(img, direction, i, j);
-         }
-      }
+   void value_iteration::set_target(cv::Point target) {
+      this->target = target;
    }
 
 }

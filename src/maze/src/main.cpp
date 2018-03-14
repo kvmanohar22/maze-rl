@@ -17,21 +17,16 @@ using namespace cv;
 int main(int argc, char **argv) {
 
    Mat image(810, 810, CV_8UC3, Scalar(0,0,0));
-   // utils::construct_maze(image);
-   // namedWindow("maze", WINDOW_AUTOSIZE);
 
-   // utils::text(image, "23.04", 4, 5);
-   // imshow("maze", image);
-   // waitKey(8000);
+   cv::Point pt;
 
-   // utils::reset_patch(image, Point(5, 4), Point(5+1, 4+1));
-   // imshow("maze", image);
-   // waitKey(8000);
-
-   // utils::text(image, "-23.04", 4, 5);
-   // imshow("maze", image);
-   // waitKey(8000);
-
+   // currently 10, 10 is hardcoded and so is (810, 810) image dimensions
    rl::value_iteration iter(10, 10);
+
+   // set obstacles and target points
+   iter.set_obstacles({Point(3, 4), Point(3, 7)});
+   iter.set_target(Point(8, 7));
+
+   // solve the maze
    iter.iterate(image);
 }

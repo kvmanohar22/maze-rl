@@ -19,7 +19,6 @@ include_directories(
 )
 
 set(lib_files 
-   src/simulator.cpp 
    src/rl.cpp
    include/maze/utils.hpp
    )

@@ -16,15 +16,17 @@ Example Matrix:
 
 ## Dependencies
 
-- ROS Kinetic
+- OpenCV
 
+## Samples 
 
-## Usage
+**[WIP]**
+Currently `value iteration` is implemented. Target has a positive reward of `10` and obstacles with a reward of `-10` and `-3`. Initial policy is random.
 
-- Starting the simulator
-   Run the last command in another terminal
-   ```bash
-   $ rosmake turtlesim
-   $ roscore
-   $ rosrun turtlesim turtlesim_node
-   ```
+- Initial random policy:
+
+![rand_policy](imgs/init.png)
+
+- Optimal policy for the given environment:
+
+![opt_policy](imgs/final.png)
